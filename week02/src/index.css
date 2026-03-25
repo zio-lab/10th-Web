@@ -42,7 +42,7 @@ body {
 }
 
 .todo-container__button {
-    background-color: rgb(149, 173, 199);
+    background-color: lightsteelblue;
     color: white;
     border: none;
     padding: 8px 12px;
