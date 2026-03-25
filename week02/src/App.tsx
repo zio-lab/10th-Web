@@ -1,12 +1,11 @@
-import "./App.css";
-import Todo from "./components/Todo";
-import { TodoProvider } from "./context/TodoContext";
+import { ThemeProvider } from "./mission02/context/ThemeProvider";
+import Navbar from "./mission02/Navbar";
 
 function App() {
   return (
-    <TodoProvider>
-      <Todo />
-    </TodoProvider>
+    <ThemeProvider>
+      <Navbar />
+    </ThemeProvider>
   );
 }
 
