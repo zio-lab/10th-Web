@@ -1,81 +1,55 @@
-import { useState } from 'react';
-import type { TTodo } from '../types/todo';
+import { useState } from "react";
+import type { TTodo } from "../types/todo";
+import TodoForm from "./TodoForm";
+import TodoList from "./TodoList";
 
 const Todo = () => {
     const [todos, setTodos] = useState<TTodo[]>([]);
-    const [doneTodos, setDoneTodos] = useState<TTodo[]>([]);
-    const [input, setInput] = useState<string>('');
+        const [doneTodos, setDoneTodos] = useState<TTodo[]>([]);
+        const [input, setInput] = useState<string>('');
+        
+        const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            const text = input.trim();
+            if (text) {
+                const newTodo: TTodo = {
+                    id: Date.now(),
+                    text,
+                };
+                setTodos((prevTodos) : TTodo[]=> [...prevTodos, newTodo]);
+                setInput('');
+            }
+        };
     
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const text = input.trim();
-        if (text) {
-            const newTodo: TTodo = {
-                id: Date.now(),
-                text,
-            };
-            setTodos((prevTodos) : TTodo[]=> [...prevTodos, newTodo]);
-            setInput('');
-        }
-    };
-
-    const completeTodo = (todo: TTodo) => {
-        setTodos((prevTodos) => prevTodos.filter((t) => t.id !== todo.id));
-        setDoneTodos((prevDoneTodos) => [...prevDoneTodos, todo]);
-    };
-
-    const deleteTodo = (todo: TTodo) => {
-        setDoneTodos((prevDoneTodos) => prevDoneTodos.filter((t) => t.id !== todo.id));
-    }; 
+        const completeTodo = (todo: TTodo) => {
+            setTodos((prevTodos) => prevTodos.filter((t) => t.id !== todo.id));
+            setDoneTodos((prevDoneTodos) => [...prevDoneTodos, todo]);
+        };
     
-    return ( 
+        const deleteTodo = (todo: TTodo) => {
+            setDoneTodos((prevDoneTodos) => prevDoneTodos.filter((t) => t.id !== todo.id));
+        }; 
+    return (
         <div className = 'todo-container'>
             <h1 className = 'todo-container__header'>ZIO TODO</h1>
-            <form className = 'todo-container__form' onSubmit={handleSubmit}>
-                <input
-                    type='text'
-                    className='todo-container__input'
-                    placeholder='할 일 입력'
-                    required
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                />
-                <button type = 'submit' className = 'todo-container__button'>
-                    할 일 추가
-                </button>
-            </form>
+            <TodoForm input = {input} setInput = {setInput} handleSubmit = {handleSubmit} />
             <div className='render-container'>
-                <div className='render-container__section'>
-                    <h2 className='render-container__title'>할 일</h2>
-                    <ul id = 'todo-list' className='render-container__list'>
-                        {todos.map((todo) => (
-                            <li key={todo.id} className='render-container__item'>
-                                <span className="render-container__item-text">{todo.text}</span>
-                                <button 
-                                    onClick={() => completeTodo(todo)}
-                                    style={{ backgroundColor: 'lightsteelblue' }} 
-                                     className='render-container__item-button'>완료</button>
-                            </li>
-                        ))}
-                    </ul> 
-                </div>
-                <div className='render-container__section'>
-                    <h2 className='render-container__title'>완료</h2>
-                    <ul id = 'todo-list' className='render-container__list'>
-                        {doneTodos .map((todo) => (
-                            <li key={todo.id} className='render-container__item'>
-                                <span className="render-container__item-text">{todo.text}</span>
-                                <button
-                                    onClick={() => deleteTodo(todo)} 
-                                    style={{ backgroundColor: 'lightcoral' }} 
-                                    className='render-container__item-button'>삭제</button>
-                            </li>
-                        ))}
-                    </ul> 
-                </div>
- 
+                <TodoList 
+                    title='할 일'
+                    todos={todos}
+                    buttonText='완료'
+                    buttonColor='lightsteelblue'
+                    onButtonClick={completeTodo}
+                />
+                <TodoList 
+                    title='완료'
+                    todos={doneTodos}
+                    buttonText='삭제'
+                    buttonColor='lightcoral'
+                    onButtonClick={deleteTodo}  
+                />
             </div>
-        </div> 
+        </div>
     );
-}
+};
 export default Todo;
