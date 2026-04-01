@@ -20,4 +20,4 @@ export type MovieResponse = {
     results: Movie[];
     total_pages: number;
     total_results: number;
-}
+} 
