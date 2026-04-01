@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import type { Movie } from "../types/movie";
+import type { Movie, MovieResponse } from "../types/movie";
 import MovieCard from "../components/MovieCard";
 
 export default function MoviePage() {
@@ -8,7 +8,7 @@ export default function MoviePage() {
 
     useEffect(() => {
         const fetchmovies = async () => {
-            const {data} = await axios.get('https://api.themoviedb.org/3/movie/popular', {
+            const {data} = await axios.get<MovieResponse>('https://api.themoviedb.org/3/movie/popular', {
                 headers: {
                     Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
                     'Content-Type': 'application/json;charset=utf-8'
