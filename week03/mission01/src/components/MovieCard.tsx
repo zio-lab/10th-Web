@@ -6,8 +6,12 @@ interface MovieCardProps {
 
 export default function MovieCard({ movie }: MovieCardProps) {
     return (
-        <div>
-            <img src = {`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} /> 
-        </div>
+    <div className=' '>
+        <img 
+            src = {`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+            alt={` ${movie.title}영화의 이미지 `}
+            className='' 
+        /> 
+    </div>
     )
 }    
