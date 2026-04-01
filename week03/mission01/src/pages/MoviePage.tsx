@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import type { Movie, MovieResponse } from "../types/movie";
 import MovieCard from "../components/MovieCard";
-import { LodingSpinner } from "../components/LodingSpinner";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 export default function MoviePage() {
     const [movies, setMovies] = useState<Movie[]>([]);
@@ -69,7 +69,7 @@ export default function MoviePage() {
 
             {isPending && (
                 <div className="flex justify-center items-center h-screen">
-                    <LodingSpinner />
+                    <LoadingSpinner />
                 </div>
             )}
 
