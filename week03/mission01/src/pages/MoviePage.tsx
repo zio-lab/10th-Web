@@ -3,23 +3,33 @@ import axios from "axios";
 import type { Movie, MovieResponse } from "../types/movie";
 import MovieCard from "../components/MovieCard";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { useParams } from "react-router-dom";
 
 export default function MoviePage() {
     const [movies, setMovies] = useState<Movie[]>([]);
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState(false);
     const [page, setPage] = useState(1);
+    const { category } = useParams<{ category: string }>();
 
     useEffect(() => {
+        if (!category) {
+            setError(true);
+            return;
+        }
+
         const fetchmovies = async () => {
             setIsPending(true);
             setError(false);
 
             try {
                 const { data } = await axios.get<MovieResponse>(
-                    "https://api.themoviedb.org/3/movie/popular",
+                    `https://api.themoviedb.org/3/movie/${category}`,
                     {
-                        params: { page },
+                        params: {
+                            language: "ko-KR",
+                            page,
+                        },
                         headers: {
                             Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
                             "Content-Type": "application/json;charset=utf-8",
@@ -36,7 +46,7 @@ export default function MoviePage() {
         };
 
         fetchmovies();
-    }, [page]);
+    }, [page, category]);
 
     if (error) {
         return (
@@ -73,9 +83,9 @@ export default function MoviePage() {
                 </div>
             )}
 
-            {!isPending && (
+            {!isPending && !error && (
                 <div className="p-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                    {movies?.map((movie) => (
+                    {movies.map((movie) => (
                         <MovieCard key={movie.id} movie={movie} />
                     ))}
                 </div>
