@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import {
   IoChevronBack,
@@ -31,12 +31,37 @@ export default function SignupPage() {
       validate,
     });
 
+  const isStep1Valid = useMemo(() => {
+    return values.email.trim() !== "" && !errors.email;
+  }, [values.email, errors.email]);
+
+  const isStep2Valid = useMemo(() => {
+    return (
+      values.password.trim() !== "" &&
+      values.passwordConfirm.trim() !== "" &&
+      !errors.password &&
+      !errors.passwordConfirm
+    );
+  }, [
+    values.password,
+    values.passwordConfirm,
+    errors.password,
+    errors.passwordConfirm,
+  ]);
+
+  const isStep3Valid = useMemo(() => {
+    return values.nickname.trim() !== "" && !errors.nickname;
+  }, [values.nickname, errors.nickname]);
+
+  const isCurrentStepValid =
+    (step === 1 && isStep1Valid) ||
+    (step === 2 && isStep2Valid) ||
+    (step === 3 && isStep3Valid);
+
   const handleNext = () => {
     if (step === 1) {
       handleBlur("email");
-
-      if (errors.email || !values.email.trim()) return;
-
+      if (!isStep1Valid) return;
       setStep(2);
       return;
     }
@@ -44,23 +69,13 @@ export default function SignupPage() {
     if (step === 2) {
       handleBlur("password");
       handleBlur("passwordConfirm");
-
-      if (
-        errors.password ||
-        errors.passwordConfirm ||
-        !values.password.trim() ||
-        !values.passwordConfirm.trim()
-      ) {
-        return;
-      }
-
+      if (!isStep2Valid) return;
       setStep(3);
       return;
     }
 
     handleBlur("nickname");
-
-    if (errors.nickname || !values.nickname.trim()) return;
+    if (!isStep3Valid) return;
 
     console.log("회원가입 완료", values);
     navigate("/");
@@ -228,7 +243,12 @@ export default function SignupPage() {
             <button
               type="button"
               onClick={handleNext}
-              className="h-[48px] w-full rounded-md bg-[#1f1f1f] text-base font-semibold text-gray-500"
+              disabled={!isCurrentStepValid}
+              className={`h-[48px] w-full rounded-md text-base font-semibold transition ${
+                isCurrentStepValid
+                  ? "bg-pink-500 text-white hover:bg-pink-600"
+                  : "cursor-not-allowed bg-[#1f1f1f] text-gray-500"
+              }`}
             >
               {step === 3 ? "회원가입 완료" : "다음"}
             </button>
