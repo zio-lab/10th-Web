@@ -1,49 +1,20 @@
-import "./App.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import MoviePage from "./pages/MoviePage";
-import MovieDetailPage from "./pages/MovieDetailPage";
+import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import Layout from "./pages/Layout";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  useParams,
-} from "react-router-dom";
-
-function MoviePageWrapper() {
-  const { category } = useParams<{ category: string }>();
-
-  return <MoviePage key={category} />;
-}
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    errorElement: <NotFoundPage />,
-    children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: "movies/:category",
-        element: <MoviePageWrapper />,
-      },
-      {
-        path: "movies/:category/:movieId",
-        element: <MovieDetailPage />,
-      },
-      {
-        path: "*",
-        element: <NotFoundPage />,
-      },
-    ],
-  },
-]);
+import SignupPage from "./pages/SignupPage";
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
