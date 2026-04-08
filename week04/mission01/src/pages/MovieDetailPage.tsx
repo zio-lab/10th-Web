@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import useCustomFetch from "../hooks/useCustomFetch";
 import type {
   Cast,
   CreditsResponse,
@@ -13,53 +12,31 @@ export default function MovieDetailPage() {
   const { movieId, category } = useParams<{ movieId: string; category: string }>();
   const navigate = useNavigate();
 
-  const [movieDetail, setMovieDetail] = useState<MovieDetail | null>(null);
-  const [casts, setCasts] = useState<Cast[]>([]);
-  const [directors, setDirectors] = useState<Crew[]>([]);
-  const [isPending, setIsPending] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-  if (!movieId) { setError(true); return; }
-
-  const controller = new AbortController(); // ← 요청 취소용 컨트롤러
-
-  const fetchMovieDetailData = async () => {
-    setIsPending(true);
-    setError(false);
-    try {
-      const [detailResponse, creditsResponse] = await Promise.all([
-        axios.get<MovieDetail>(
-          `https://api.themoviedb.org/3/movie/${movieId}`,
-          {
-            params: { language: "ko-KR" },
-            headers: { Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}` },
-            signal: controller.signal, // ← signal 전달
-          }
-        ),
-        axios.get<CreditsResponse>(
-          `https://api.themoviedb.org/3/movie/${movieId}/credits`,
-          {
-            headers: { Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}` },
-            signal: controller.signal, // ← signal 전달
-          }
-        ),
-      ]);
-
-      setMovieDetail(detailResponse.data);
-      setCasts(creditsResponse.data.cast.slice(0, 10));
-      setDirectors(creditsResponse.data.crew.filter(c => c.job === "Director"));
-    } catch (err) {
-      // axios.isCancel로 abort 에러와 실제 에러를 구분
-      if (!axios.isCancel(err)) setError(true);
-    } finally {
-      if (!controller.signal.aborted) setIsPending(false);
+  const {
+    data: movieDetail,
+    isPending: isDetailPending,
+    error: detailError,
+  } = useCustomFetch<MovieDetail>(
+    movieId ? `https://api.themoviedb.org/3/movie/${movieId}` : "",
+    {
+      language: "ko-KR",
     }
-  };
+  );
 
-  fetchMovieDetailData();
-  return () => { controller.abort(); }; // ← 실제 네트워크 요청도 취소
-}, [movieId]);
+  const {
+    data: creditsData,
+    isPending: isCreditsPending,
+    error: creditsError,
+  } = useCustomFetch<CreditsResponse>(
+    movieId ? `https://api.themoviedb.org/3/movie/${movieId}/credits` : ""
+  );
+
+  const isPending = isDetailPending || isCreditsPending;
+  const error = detailError || creditsError;
+
+  const casts: Cast[] = creditsData?.cast.slice(0, 10) ?? [];
+  const directors: Crew[] =
+    creditsData?.crew.filter((crewMember) => crewMember.job === "Director") ?? [];
 
   if (isPending) {
     return (
@@ -87,48 +64,54 @@ export default function MovieDetailPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <div
-        className="w-full h-[420px] bg-cover bg-center relative"
+        className="relative h-[420px] w-full bg-cover bg-center"
         style={{
-          backgroundImage: `url(https://image.tmdb.org/t/p/original${movieDetail.backdrop_path})`,
+          backgroundImage: movieDetail.backdrop_path
+            ? `url(https://image.tmdb.org/t/p/original${movieDetail.backdrop_path})`
+            : "none",
         }}
       >
         <div className="absolute inset-0 bg-black/60" />
       </div>
 
-      <div className="max-w-6xl mx-auto px-8 -mt-48 relative z-10">
-        <div className="flex flex-col md:flex-row gap-10">
-          <img
-            src={`https://image.tmdb.org/t/p/w500${movieDetail.poster_path}`}
-            alt={`${movieDetail.title} 포스터`}
-            className="w-72 rounded-2xl shadow-2xl"
-          />
+      <div className="relative z-10 mx-auto -mt-48 max-w-6xl px-8">
+        <div className="flex flex-col gap-10 md:flex-row">
+          {movieDetail.poster_path ? (
+            <img
+              src={`https://image.tmdb.org/t/p/w500${movieDetail.poster_path}`}
+              alt={`${movieDetail.title} 포스터`}
+              className="w-72 rounded-2xl shadow-2xl"
+            />
+          ) : (
+            <div className="flex h-[408px] w-72 items-center justify-center rounded-2xl bg-zinc-800 text-zinc-400 shadow-2xl">
+              이미지 없음
+            </div>
+          )}
 
           <div className="flex-1 pt-6">
-            <p className="text-pink-300 mb-2">{movieDetail.tagline}</p>
+            <p className="mb-2 text-pink-300">{movieDetail.tagline}</p>
 
-            <h1 className="text-4xl font-bold mb-3">{movieDetail.title}</h1>
+            <h1 className="mb-3 text-4xl font-bold">{movieDetail.title}</h1>
 
-            <p className="text-zinc-300 mb-4">
-              {movieDetail.original_title}
-            </p>
+            <p className="mb-4 text-zinc-300">{movieDetail.original_title}</p>
 
-            <div className="flex flex-wrap gap-3 mb-5">
-              <span className="px-3 py-1 bg-zinc-800 rounded-full">
+            <div className="mb-5 flex flex-wrap gap-3">
+              <span className="rounded-full bg-zinc-800 px-3 py-1">
                 개봉일 {movieDetail.release_date}
               </span>
-              <span className="px-3 py-1 bg-zinc-800 rounded-full">
+              <span className="rounded-full bg-zinc-800 px-3 py-1">
                 평점 {movieDetail.vote_average.toFixed(1)}
               </span>
-              <span className="px-3 py-1 bg-zinc-800 rounded-full">
+              <span className="rounded-full bg-zinc-800 px-3 py-1">
                 러닝타임 {movieDetail.runtime}분
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="mb-6 flex flex-wrap gap-2">
               {movieDetail.genres.map((genre) => (
                 <span
                   key={genre.id}
-                  className="px-3 py-1 bg-[#dda5e3] text-white rounded-full text-sm"
+                  className="rounded-full bg-[#dda5e3] px-3 py-1 text-sm text-white"
                 >
                   {genre.name}
                 </span>
@@ -136,18 +119,18 @@ export default function MovieDetailPage() {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-3">줄거리</h2>
-              <p className="text-zinc-200 leading-8">{movieDetail.overview}</p>
+              <h2 className="mb-3 text-2xl font-semibold">줄거리</h2>
+              <p className="leading-8 text-zinc-200">{movieDetail.overview}</p>
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-3">감독</h2>
+              <h2 className="mb-3 text-2xl font-semibold">감독</h2>
               <div className="flex flex-wrap gap-3">
                 {directors.length > 0 ? (
                   directors.map((director) => (
                     <span
                       key={director.id}
-                      className="px-4 py-2 bg-zinc-800 rounded-lg"
+                      className="rounded-lg bg-zinc-800 px-4 py-2"
                     >
                       {director.name}
                     </span>
@@ -161,29 +144,29 @@ export default function MovieDetailPage() {
         </div>
 
         <div className="mt-14 pb-16">
-          <h2 className="text-2xl font-semibold mb-6">출연진</h2>
+          <h2 className="mb-6 text-2xl font-semibold">출연진</h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {casts.map((actor) => (
               <div
                 key={actor.id}
-                className="bg-zinc-900 rounded-2xl overflow-hidden shadow-lg"
+                className="overflow-hidden rounded-2xl bg-zinc-900 shadow-lg"
               >
                 {actor.profile_path ? (
                   <img
                     src={`https://image.tmdb.org/t/p/w300${actor.profile_path}`}
                     alt={actor.name}
-                    className="w-full h-72 object-cover"
+                    className="h-72 w-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-72 bg-zinc-800 flex items-center justify-center text-zinc-400">
+                  <div className="flex h-72 w-full items-center justify-center bg-zinc-800 text-zinc-400">
                     이미지 없음
                   </div>
                 )}
 
                 <div className="p-4">
                   <p className="font-semibold">{actor.name}</p>
-                  <p className="text-sm text-zinc-400 mt-1">{actor.character}</p>
+                  <p className="mt-1 text-sm text-zinc-400">{actor.character}</p>
                 </div>
               </div>
             ))}

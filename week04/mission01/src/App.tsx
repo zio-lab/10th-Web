@@ -4,7 +4,17 @@ import MoviePage from "./pages/MoviePage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import Layout from "./pages/Layout";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useParams,
+} from "react-router-dom";
+
+function MoviePageWrapper() {
+  const { category } = useParams<{ category: string }>();
+
+  return <MoviePage key={category} />;
+}
 
 const router = createBrowserRouter([
   {
@@ -18,7 +28,7 @@ const router = createBrowserRouter([
       },
       {
         path: "movies/:category",
-        element: <MoviePage />,
+        element: <MoviePageWrapper />,
       },
       {
         path: "movies/:category/:movieId",
