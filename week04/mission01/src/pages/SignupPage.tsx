@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
 import { IoChevronBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import useForm from "../hooks/useForm";
@@ -12,15 +13,16 @@ export default function SignupPage() {
   const validate = (values: SignupFormValues) =>
     validateSignupByStep(values, step);
 
-  const { values, errors, handleBlur } = useForm<SignupFormValues>({
-    initialValues: {
-      email: "",
-      password: "",
-      passwordConfirm: "",
-      nickname: "",
-    },
-    validate,
-  });
+  const { values, errors, touched, getInputProps, handleBlur } =
+    useForm<SignupFormValues>({
+      initialValues: {
+        email: "",
+        password: "",
+        passwordConfirm: "",
+        nickname: "",
+      },
+      validate,
+    });
 
   const handleNext = () => {
     if (step === 1) {
@@ -107,9 +109,35 @@ export default function SignupPage() {
 
             <h2 className="mb-8 text-center text-3xl font-bold">회원가입</h2>
 
-            <div className="mb-6 text-center text-sm text-gray-400">
-              현재 단계: {step}
-            </div>
+            {step === 1 && (
+              <>
+                <button
+                  type="button"
+                  className="mb-6 flex h-[48px] w-full items-center justify-center gap-3 rounded-md border border-gray-400 bg-black text-white transition-colors hover:bg-gray-800"
+                >
+                  <FcGoogle size={22} />
+                  <span className="font-medium">구글 로그인</span>
+                </button>
+
+                <div className="mb-6 flex items-center gap-4">
+                  <div className="h-px flex-1 bg-gray-500" />
+                  <span className="text-sm font-semibold text-gray-300">OR</span>
+                  <div className="h-px flex-1 bg-gray-500" />
+                </div>
+
+                <div className="mb-6">
+                  <input
+                    type="email"
+                    placeholder="이메일을 입력해주세요!"
+                    className="h-[48px] w-full rounded-md border border-gray-500 bg-[#111] px-4 text-white outline-none placeholder:text-gray-500 focus:border-blue-500"
+                    {...getInputProps("email")}
+                  />
+                  <div className="mt-2 min-h-[20px] text-sm text-red-500">
+                    {touched.email && errors.email}
+                  </div>
+                </div>
+              </>
+            )}
 
             <button
               type="button"
