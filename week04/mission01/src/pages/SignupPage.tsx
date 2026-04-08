@@ -205,12 +205,32 @@ export default function SignupPage() {
               </>
             )}
 
+            {step === 3 && (
+              <div className="mb-6 flex flex-col items-center">
+                <div className="mb-5 flex h-40 w-40 items-center justify-center rounded-full bg-gray-200">
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-300" />
+                </div>
+
+                <div className="w-full">
+                  <input
+                    type="text"
+                    placeholder="닉네임을 입력해주세요"
+                    className="h-[48px] w-full rounded-md border border-gray-500 bg-[#111] px-4 text-white outline-none placeholder:text-gray-500 focus:border-blue-500"
+                    {...getInputProps("nickname")}
+                  />
+                  <div className="mt-2 min-h-[20px] text-sm text-red-500">
+                    {touched.nickname && errors.nickname}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <button
               type="button"
               onClick={handleNext}
               className="h-[48px] w-full rounded-md bg-[#1f1f1f] text-base font-semibold text-gray-500"
             >
-              다음
+              {step === 3 ? "회원가입 완료" : "다음"}
             </button>
           </div>
         </div>
