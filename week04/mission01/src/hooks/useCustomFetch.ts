@@ -6,7 +6,7 @@ export default function useCustomFetch<T>(
   params?: Record<string, string | number>
 ) {
   const [data, setData] = useState<T | null>(null);
-  const [isPending, setIsPending] = useState<boolean>(true);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
@@ -19,15 +19,15 @@ export default function useCustomFetch<T>(
     const source = axios.CancelToken.source();
 
     const fetchData = async () => {
-      setIsPending(true);
       setError(false);
+      setIsPending(true);
 
       try {
         const response = await axios.get<T>(url, {
           params,
           cancelToken: source.token,
           headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
+            Authorization: `Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}`,
             "Content-Type": "application/json;charset=utf-8",
           },
         });

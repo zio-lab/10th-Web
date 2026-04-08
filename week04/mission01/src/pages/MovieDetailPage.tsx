@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import useCustomFetch from "../hooks/useCustomFetch";
@@ -11,17 +12,21 @@ import type {
 export default function MovieDetailPage() {
   const { movieId, category } = useParams<{ movieId: string; category: string }>();
   const navigate = useNavigate();
+  const detailParams = useMemo(
+  () => ({
+    language: "ko-KR",
+  }),
+  []
+);
 
   const {
-    data: movieDetail,
-    isPending: isDetailPending,
-    error: detailError,
-  } = useCustomFetch<MovieDetail>(
-    movieId ? `https://api.themoviedb.org/3/movie/${movieId}` : "",
-    {
-      language: "ko-KR",
-    }
-  );
+  data: movieDetail,
+  isPending: isDetailPending,
+  error: detailError,
+} = useCustomFetch<MovieDetail>(
+  movieId ? `https://api.themoviedb.org/3/movie/${movieId}` : "",
+  detailParams
+);
 
   const {
     data: creditsData,
