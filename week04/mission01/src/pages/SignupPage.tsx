@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { IoChevronBack } from "react-icons/io5";
+import {
+  IoChevronBack,
+  IoEyeOffOutline,
+  IoEyeOutline,
+} from "react-icons/io5";
+import { MdEmail } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import useForm from "../hooks/useForm";
 import { validateSignupByStep } from "../utils/validate";
@@ -9,6 +14,8 @@ import type { SignupFormValues } from "../utils/validate";
 export default function SignupPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   const validate = (values: SignupFormValues) =>
     validateSignupByStep(values, step);
@@ -134,6 +141,65 @@ export default function SignupPage() {
                   />
                   <div className="mt-2 min-h-[20px] text-sm text-red-500">
                     {touched.email && errors.email}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <div className="mb-4 flex items-center gap-2 text-sm text-gray-300">
+                  <MdEmail size={18} />
+                  <span>{values.email}</span>
+                </div>
+
+                <div className="mb-4">
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="비밀번호를 입력해주세요!"
+                      className="h-[48px] w-full rounded-md border border-gray-500 bg-[#111] px-4 pr-12 text-white outline-none placeholder:text-gray-500 focus:border-blue-500"
+                      {...getInputProps("password")}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    >
+                      {showPassword ? (
+                        <IoEyeOutline size={20} />
+                      ) : (
+                        <IoEyeOffOutline size={20} />
+                      )}
+                    </button>
+                  </div>
+                  <div className="mt-2 min-h-[20px] text-sm text-red-500">
+                    {touched.password && errors.password}
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <div className="relative">
+                    <input
+                      type={showPasswordConfirm ? "text" : "password"}
+                      placeholder="비밀번호를 다시 한 번 입력해주세요!"
+                      className="h-[48px] w-full rounded-md border border-gray-500 bg-[#111] px-4 pr-12 text-white outline-none placeholder:text-gray-500 focus:border-blue-500"
+                      {...getInputProps("passwordConfirm")}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordConfirm((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    >
+                      {showPasswordConfirm ? (
+                        <IoEyeOutline size={20} />
+                      ) : (
+                        <IoEyeOffOutline size={20} />
+                      )}
+                    </button>
+                  </div>
+                  <div className="mt-2 min-h-[20px] text-sm text-red-500">
+                    {touched.passwordConfirm && errors.passwordConfirm}
                   </div>
                 </div>
               </>
