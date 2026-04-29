@@ -6,6 +6,8 @@ import type {
   RequestSigninDto,
   ResponseSigninDto,
   ResponseMyInfoDto,
+  RequestRefreshTokenDto,
+  ResponseRefreshTokenDto,
 } from "./dto";
 
 export const postSignup = async (
@@ -34,4 +36,12 @@ export const postLogout = async () => {
   const { data } = await axiosInstance.post("/v1/auth/logout");
 
   return data; 
+};
+
+export const postRefreshToken = async (
+  body: RequestRefreshTokenDto,
+): Promise<ResponseRefreshTokenDto> => {
+  const { data } = await axiosInstance.post("/v1/auth/refresh", body);
+
+  return data;
 };

@@ -25,3 +25,19 @@ export interface ResponseMyInfoDto {
   email: string;
   name: string;
 }
+
+export interface RequestRefreshTokenDto {
+  refresh: string;
+}
+
+export interface ResponseRefreshTokenDto {
+  status: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    id: number;
+    name: string;
+    accessToken: string;
+    refreshToken: string;
+  };
+}
