@@ -18,8 +18,7 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
-  const validate = (values: SignupFormValues) =>
-    validateSignup(values);
+  
 
   const { values, errors, touched, getInputProps, handleBlur } =
     useForm<SignupFormValues>({
@@ -29,7 +28,7 @@ export default function SignupPage() {
         passwordConfirm: "",
         nickname: "",
       },
-      validate,
+      validate: validateSignup,
     });
 
   const handleGoogleLogin = () => {
@@ -99,7 +98,11 @@ export default function SignupPage() {
       navigate("/login");
     } catch (error) {
       console.error("회원가입 중 오류가 발생했습니다:", error);
-      alert("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+      const message =
+        error instanceof Error
+          ? error.message
+          : "회원가입 중 오류가 발생했습니다. 다시 시도해주세요.";
+      alert(message);
     }
   };
 
@@ -119,7 +122,13 @@ export default function SignupPage() {
 
   return (
     <div className="flex min-h-full items-center justify-center bg-black px-6 py-10 text-white">
-      <div className="w-full max-w-[360px]">
+      <form
+        className="w-full max-w-[360px]"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleNext();
+        }}
+      >
 
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-[360px]">
@@ -244,8 +253,7 @@ export default function SignupPage() {
             )}
 
             <button
-              type="button"
-              onClick={handleNext}
+              type="submit"
               disabled={!isCurrentStepValid}
               className={`h-[48px] w-full rounded-md text-base font-semibold transition ${
                 isCurrentStepValid
@@ -257,7 +265,7 @@ export default function SignupPage() {
             </button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
