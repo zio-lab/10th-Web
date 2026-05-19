@@ -1,13 +1,18 @@
-export const useLocalStorage = (key: string) => {
-  const setItem = (value: unknown) => {
-    try {
-      window.localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.log(error);
-    }
-  };
+import { useCallback } from "react";
 
-  const getItem = () => {
+export const useLocalStorage = <T>(key: string) => {
+  const setItem = useCallback(
+    (value: T) => {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [key]
+  );
+
+  const getItem = useCallback((): T | null => {
     try {
       const item: string | null = window.localStorage.getItem(key);
 
@@ -16,15 +21,15 @@ export const useLocalStorage = (key: string) => {
       console.log(e);
       return null;
     }
-  };
+  }, [key]);
 
-  const removeItem = () => {
+  const removeItem = useCallback(() => {
     try {
       window.localStorage.removeItem(key);
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [key]);
 
   return { setItem, getItem, removeItem };
 };

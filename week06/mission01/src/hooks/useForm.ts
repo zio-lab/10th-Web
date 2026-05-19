@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 
 export type FormErrors<T> = Partial<Record<keyof T, string>>;
 type FormTouched<T> = Partial<Record<keyof T, boolean>>;
@@ -17,7 +17,8 @@ function useForm<T extends { [K in keyof T]: string }>({
 
   const errors = useMemo(() => {
     return validate(values);
-  }, [values, validate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values]);
 
   const handleChange = (name: keyof T, value: T[keyof T]) => {
     setValues((prevValues) => ({
@@ -37,7 +38,7 @@ function useForm<T extends { [K in keyof T]: string }>({
     name: String(name),
     value: values[name] ?? "",
     onChange: (
-      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => handleChange(name, e.target.value as T[keyof T]),
     onBlur: () => handleBlur(name),
   });

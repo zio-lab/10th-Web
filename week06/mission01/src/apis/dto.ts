@@ -110,7 +110,6 @@ export interface RequestCreateLpDto {
   content: string;
   thumbnail?: string;
   tags?: string[];
-  published?: boolean;
 }
 
 export interface LikeResponse {

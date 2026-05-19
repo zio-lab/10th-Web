@@ -20,14 +20,14 @@ export default function LpCreatePage() {
         content,
         thumbnail: thumbnail || undefined,
         tags: tags.length > 0 ? tags : undefined,
-        published: true,
       }),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["lps"] });
       navigate(`/lps/${res.data.id}`);
     },
     onError: (error: any) => {
-      const msg = error?.response?.data?.message ?? "알 수 없는 오류";
+      const raw = error?.response?.data?.message;
+      const msg = Array.isArray(raw) ? raw.join("\n") : (raw ?? "알 수 없는 오류");
       alert(`LP 생성에 실패했습니다.\n${msg}`);
       console.error("LP 생성 오류:", error?.response?.data);
     },
@@ -56,6 +56,10 @@ export default function LpCreatePage() {
     e.preventDefault();
     if (!title.trim()) {
       alert("제목을 입력해주세요.");
+      return;
+    }
+    if (!content.trim()) {
+      alert("내용을 입력해주세요.");
       return;
     }
     mutation.mutate();
@@ -122,7 +126,7 @@ export default function LpCreatePage() {
         {/* 본문 */}
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-300">
-            내용
+            내용 <span className="text-pink-400">*</span>
           </label>
           <textarea
             placeholder="LP에 대한 설명을 입력해주세요"

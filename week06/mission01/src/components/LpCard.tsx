@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import type { Lp } from "../apis/dto";
 
 const formatDate = (dateStr: string) => {
@@ -24,15 +24,15 @@ interface LpCardProps {
 }
 
 const LpCard = ({ lp }: LpCardProps) => {
-  const navigate = useNavigate();
   const [imgError, setImgError] = useState(false);
   const showFallback = !lp.thumbnail || imgError;
 
   return (
-    <div
+    <Link
+      to={`/lps/${lp.id}`}
       className="group relative mb-2 cursor-pointer overflow-hidden break-inside-avoid"
-      onClick={() => navigate(`/lps/${lp.id}`)}
     >
+    
       {showFallback ? (
         <div className="flex h-48 w-full items-center justify-center bg-gray-800">
           <VinylIcon />
@@ -57,7 +57,7 @@ const LpCard = ({ lp }: LpCardProps) => {
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
