@@ -18,6 +18,7 @@ export default function GoogleCallbackPage() {
     } else {
       navigate("/login", { replace: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

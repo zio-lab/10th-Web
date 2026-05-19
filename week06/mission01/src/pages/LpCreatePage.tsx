@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, type KeyboardEvent, type SyntheticEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 import { createLp } from "../apis/lp";
 
 export default function LpCreatePage() {
@@ -25,11 +26,11 @@ export default function LpCreatePage() {
       queryClient.invalidateQueries({ queryKey: ["lps"] });
       navigate(`/lps/${res.data.id}`);
     },
-    onError: (error: any) => {
-      const raw = error?.response?.data?.message;
+    onError: (error: AxiosError<{ message: string | string[] }>) => {
+      const raw = error.response?.data?.message;
       const msg = Array.isArray(raw) ? raw.join("\n") : (raw ?? "알 수 없는 오류");
       alert(`LP 생성에 실패했습니다.\n${msg}`);
-      console.error("LP 생성 오류:", error?.response?.data);
+      console.error("LP 생성 오류:", error.response?.data);
     },
   });
 
@@ -41,7 +42,7 @@ export default function LpCreatePage() {
     setTagInput("");
   };
 
-  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleAddTag();
@@ -52,7 +53,7 @@ export default function LpCreatePage() {
     setTags((prev) => prev.filter((t) => t !== tag));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!title.trim()) {
       alert("제목을 입력해주세요.");

@@ -15,20 +15,21 @@ export type AuthContextType = {
   deleteAccount: () => Promise<void>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { setItem: setAccessTokenToStorage, getItem: getAccessTokenFromStorage, removeItem: removeAccessTokenFromStorage } =
-    useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+    useLocalStorage<string>(LOCAL_STORAGE_KEY.accessToken);
 
   const { setItem: setRefreshTokenToStorage, getItem: getRefreshTokenFromStorage, removeItem: removeRefreshTokenFromStorage } =
-    useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+    useLocalStorage<string>(LOCAL_STORAGE_KEY.refreshToken);
 
   const { setItem: setNameToStorage, getItem: getNameFromStorage, removeItem: removeNameFromStorage } =
-    useLocalStorage(LOCAL_STORAGE_KEY.name);
+    useLocalStorage<string>(LOCAL_STORAGE_KEY.name);
 
   const { setItem: setUserIdToStorage, getItem: getUserIdFromStorage, removeItem: removeUserIdFromStorage } =
-    useLocalStorage(LOCAL_STORAGE_KEY.userId);
+    useLocalStorage<string>(LOCAL_STORAGE_KEY.userId);
 
   const [accessToken, setAccessToken] = useState<string | null>(getAccessTokenFromStorage());
   const [refreshToken, setRefreshToken] = useState<string | null>(getRefreshTokenFromStorage());

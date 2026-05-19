@@ -38,7 +38,7 @@ export default function LpDetailPage() {
       alert("로그인이 필요한 서비스입니다. 로그인을 해주세요!");
       navigate("/login", { state: { from: location.pathname }, replace: true });
     }
-  }, [accessToken]);
+  }, [accessToken, navigate, location.pathname]);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["lp", id],
@@ -105,7 +105,7 @@ export default function LpDetailPage() {
       {/* Title + edit/delete */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-white">{lp.title}</h1>
-        {accessToken && (
+        {accessToken && userId === lp.authorId && (
           <div className="flex gap-3">
             <button
               type="button"
