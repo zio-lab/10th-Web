@@ -38,6 +38,12 @@ export const postLogout = async () => {
   return data; 
 };
 
+export const deleteAccount = async () => {
+  const { data } = await axiosInstance.delete("/v1/users/me");
+
+  return data;
+};
+
 export const postRefreshToken = async (
   body: RequestRefreshTokenDto,
 ): Promise<ResponseRefreshTokenDto> => {

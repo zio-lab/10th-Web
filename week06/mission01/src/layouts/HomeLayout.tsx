@@ -5,13 +5,23 @@ import hamburgerImg from "../assets/hamburger-button.svg";
 
 const HomeLayout = () => {
   const navigate = useNavigate();
-  const { accessToken, name, logout } = useAuth();
+  const { accessToken, name, logout, deleteAccount } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     await logout();
     navigate("/login");
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!confirm("정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
+    try {
+      await deleteAccount();
+      navigate("/login");
+    } catch {
+      alert("탈퇴 처리 중 오류가 발생했습니다.");
+    }
   };
 
   /* 사이드바 외부 클릭 시 닫기 */
@@ -38,12 +48,13 @@ const HomeLayout = () => {
           <img src={hamburgerImg} alt="menu" className="h-7 w-7 invert" />
         </button>
 
-        <h1
+        <button
+          type="button"
           onClick={() => navigate("/")}
-          className="cursor-pointer text-2xl font-extrabold text-pink-500"
+          className="text-2xl font-extrabold text-pink-500 transition hover:opacity-80"
         >
           DOLIGO
-        </h1>
+        </button>
 
         <div className="ml-auto flex items-center gap-3">
           {accessToken ? (
@@ -126,7 +137,7 @@ const HomeLayout = () => {
             {accessToken && (
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={handleDeleteAccount}
                 className="w-full rounded px-3 py-2 text-left text-sm text-gray-500 transition hover:text-red-400"
               >
                 탈퇴하기

@@ -1,5 +1,5 @@
 import { createContext, useState, type ReactNode } from "react";
-import { postLogout, postSignin } from "../apis/auth";
+import { deleteAccount as deleteAccountApi, postLogout, postSignin } from "../apis/auth";
 import type { RequestSigninDto } from "../apis/dto";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
 import { useLocalStorage } from "../hooks/useLocalStorage";
@@ -12,6 +12,7 @@ export type AuthContextType = {
   login: (signinData: RequestSigninDto) => Promise<void>;
   loginWithTokens: (accessToken: string, refreshToken: string, name?: string, userId?: number) => void;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -75,28 +76,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (newUserId) setUserId(newUserId);
   };
 
+  const clearAuth = () => {
+    removeAccessTokenFromStorage();
+    removeRefreshTokenFromStorage();
+    removeNameFromStorage();
+    removeUserIdFromStorage();
+
+    setAccessToken(null);
+    setRefreshToken(null);
+    setName(null);
+    setUserId(null);
+  };
+
   const logout = async () => {
     try {
       await postLogout();
     } catch (error) {
       console.error("로그아웃 API 요청 중 오류가 발생했습니다:", error);
     } finally {
-      removeAccessTokenFromStorage();
-      removeRefreshTokenFromStorage();
-      removeNameFromStorage();
-      removeUserIdFromStorage();
-
-      setAccessToken(null);
-      setRefreshToken(null);
-      setName(null);
-      setUserId(null);
-
+      clearAuth();
       alert("로그아웃 되었습니다.");
     }
   };
 
+  const deleteAccount = async () => {
+    await deleteAccountApi();
+    clearAuth();
+  };
+
   return (
-    <AuthContext.Provider value={{ accessToken, refreshToken, name, userId, login, loginWithTokens, logout }}>
+    <AuthContext.Provider value={{ accessToken, refreshToken, name, userId, login, loginWithTokens, logout, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );
