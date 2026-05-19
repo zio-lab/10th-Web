@@ -11,8 +11,12 @@ export default function LoginPage() {
   const location = useLocation();
   const { login } = useAuth();
 
-  const from = (location.state as { from?: string })?.from ?? "/";
-
+  const from =
+    typeof location.state === "object" && 
+    location.state !== null &&
+    typeof location.state.from === "string"
+      ? (location.state.from as {from: string}).from
+      : "/";
   const { values, errors, touched, getInputProps, handleBlur } =
     useForm<LoginFormValues>({
       initialValues: {
@@ -54,12 +58,19 @@ export default function LoginPage() {
       navigate(from, { replace: true });
     } catch (error) {
       console.error("로그인 실패:", error);
+      alert("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
     }
   };
 
   return (
     <div className="flex min-h-full items-center justify-center bg-black px-6 py-10 text-white">
-      <div className="w-full max-w-[360px]">
+      <form
+        className="w-full max-w-[360px]"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
         <button
           type="button"
           onClick={() => navigate(-1)}
@@ -110,8 +121,7 @@ export default function LoginPage() {
         </div>
 
         <button
-          type="button"
-          onClick={handleSubmit}
+          type="submit"
           disabled={!isFormValid}
           className={`h-[48px] w-full rounded-md text-base font-semibold transition ${
             isFormValid
@@ -121,7 +131,7 @@ export default function LoginPage() {
         >
           로그인
         </button>
-      </div>
+      </form>
     </div>
   );
 }
