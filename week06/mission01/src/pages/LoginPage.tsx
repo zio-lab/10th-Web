@@ -55,6 +55,7 @@ export default function LoginPage() {
         password: values.password,
       });
 
+      alert("로그인에 성공했습니다.");
       navigate(from, { replace: true });
     } catch (error) {
       console.error("로그인 실패:", error);

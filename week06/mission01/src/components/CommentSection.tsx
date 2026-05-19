@@ -85,6 +85,7 @@ export default function CommentSection({ lpId }: CommentSectionProps) {
   });
 
   const handleSubmit = () => {
+    if (createMutation.isPending) return;
     if (!input.trim()) {
       setInputError("댓글 내용을 입력해주세요.");
       return;
@@ -150,7 +151,9 @@ export default function CommentSection({ lpId }: CommentSectionProps) {
                 setInput(e.target.value);
                 if (inputError) setInputError("");
               }}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+              onKeyDown={(e) => { 
+                if (e.nativeEvent.isComposing) return
+                if (e.key == "Enter") handleSubmit(); }}
               placeholder="댓글을 입력해주세요"
               maxLength={500}
               className="flex-1 rounded-md border border-gray-600 bg-[#111] px-4 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-pink-500"

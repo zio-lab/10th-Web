@@ -14,8 +14,14 @@ export const axiosInstance = axios.create({
 });
 
 const getTokenFromStorage = (key: string) => {
-  const token = localStorage.getItem(key);
-  return token ? JSON.parse(token) : null;
+  try {
+    const token = localStorage.getItem(key);
+    return token ? JSON.parse(token) : null;
+  } catch (error) {
+    console.error("Failed to parse token from localStorage:", error);
+    localStorage.removeItem(key);
+    return null;
+  }
 };
 
 const setTokenToStorage = (key: string, value: string) => {
@@ -41,6 +47,13 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config as CustomInternalAxiosRequestConfig;
+    const requestUrl = originalRequest?.url ?? "";
+
+    if (requestUrl.includes("/v1/auth/refresh")) {
+      removeTokensFromStorage();
+      window.location.href = "/login";
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;

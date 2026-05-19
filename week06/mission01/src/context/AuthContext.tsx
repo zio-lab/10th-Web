@@ -57,24 +57,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setRefreshToken(newRefreshToken);
       setName(newName);
       setUserId(newUserId);
-
-      alert("로그인에 성공했습니다.");
     } catch (error) {
       console.error("로그인 중 오류가 발생했습니다:", error);
-      alert("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
+      throw error;
     }
   };
 
   const loginWithTokens = (newAccessToken: string, newRefreshToken: string, newName?: string, newUserId?: number) => {
     setAccessTokenToStorage(newAccessToken);
     setRefreshTokenToStorage(newRefreshToken);
-    if (newName) setNameToStorage(newName);
-    if (newUserId) setUserIdToStorage(String(newUserId));
+    if (newName !== undefined ) setNameToStorage(newName);
+    if (newUserId !== undefined) setUserIdToStorage(String(newUserId));
 
     setAccessToken(newAccessToken);
     setRefreshToken(newRefreshToken);
-    if (newName) setName(newName);
-    if (newUserId) setUserId(newUserId);
+    if (newName !== undefined) setName(newName);
+    if (newUserId !== undefined) setUserId(newUserId);
   };
 
   const clearAuth = () => {
