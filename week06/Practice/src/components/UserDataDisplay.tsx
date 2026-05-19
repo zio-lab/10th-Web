@@ -9,7 +9,7 @@ export const App = () => {
   );
 }
 
-interface WelcomeData {
+interface UserData {
   id: number;
   name: string;
   email: string;
@@ -56,13 +56,14 @@ export const WelcomeData = () => {
       }}
     >
       <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <button className="glow-btn" style={btnBase} onClick={handleChangeUser}>
+        <button type="button" className="glow-btn" style={btnBase} onClick={handleChangeUser}>
           다른 사용자 불러오기
         </button>
-        <button className="glow-btn" style={btnBase} onClick={() => setIsVisible(!isVisible)}>
+        <button type="button" className="glow-btn" style={btnBase} onClick={() => setIsVisible(!isVisible)}>
           컴포넌트 토글 (언마운트 테스트)
         </button>
         <button
+          type="button"
           className="glow-btn"
           style={{ ...btnBase, background: '#f59e0b' }}
           onClick={handleTestRetry}
@@ -77,7 +78,7 @@ export const WelcomeData = () => {
 };
 
 const UserDataDisplay = ({ userId }: { userId: number }) => {
-  const { data, isPending, error } = useCustomFetch<WelcomeData>(
+  const { data, isPending, error } = useCustomFetch<UserData>(
     `https://jsonplaceholder.typicode.com/users/${userId}`
   );
 
@@ -89,13 +90,15 @@ const UserDataDisplay = ({ userId }: { userId: number }) => {
     return <div style={{ color: '#ef4444', fontSize: '18px' }}>Error Occurred</div>;
   }
 
+  if (!data) return null;
+
   return (
     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px' }}>
       <h1 style={{ fontSize: '64px', fontWeight: 700, color: '#ffffff', margin: 0 }}>
-        {data?.name}
+        {data.name}
       </h1>
-      <p style={{ fontSize: '20px', color: '#d1d5db', margin: 0 }}>{data?.email}</p>
-      <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>User ID: {data?.id}</p>
+      <p style={{ fontSize: '20px', color: '#d1d5db', margin: 0 }}>{data.email}</p>
+      <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>User ID: {data.id}</p>
     </div>
   );
 };

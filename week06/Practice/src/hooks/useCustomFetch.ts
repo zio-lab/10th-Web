@@ -18,9 +18,9 @@ export const useCustomFetch = <T>(url: string): { data: T | null; isPending: boo
 
   useEffect(() => {
     const controller = new AbortController();
+    let ignored = false;
 
     const fetchData = async () => {
-      setData(null);
       setIsPending(true);
       setError(null);
 
@@ -31,14 +31,19 @@ export const useCustomFetch = <T>(url: string): { data: T | null; isPending: boo
         try {
           const cachedData = JSON.parse(cachedItem) as CacheEntry<T>;
           if (currentTime - cachedData.lastFetched < STALE_TIME) {
-            setData(cachedData.data);
-            setIsPending(false);
+            if (!ignored) {
+              setData(cachedData.data);
+              setIsPending(false);
+            }
             return;
           }
         } catch {
           localStorage.removeItem(storageKey);
         }
       }
+
+      //캐시 미스인 경우에만 데이터 초기화
+      setData(null);
 
       try {
         const response = await fetch(url, { signal: controller.signal });
@@ -48,23 +53,37 @@ export const useCustomFetch = <T>(url: string): { data: T | null; isPending: boo
         }
 
         const newData: T = await response.json();
-        setData(newData);
+        if (!ignored) {
+          setData(newData);
 
-        localStorage.setItem(storageKey, JSON.stringify({
-          data: newData,
-          lastFetched: Date.now(),
-        }));
+        try {
+            localStorage.setItem(
+              storageKey,
+              JSON.stringify({ data: newData, lastFetched: Date.now() })
+            );
+          } catch (error) {
+            // localStorage가 꽉 찬 경우를 대비해 예외 처리
+            console.warn('Failed to cache data:', error);
+          }
+      }
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return;
-        setError(err instanceof Error ? err : new Error('Unknown error'));
+        if (!ignored) {
+          setError(err instanceof Error ? err : new Error('Unknown error'));
+        }
       } finally {
-        setIsPending(false);
+        if (!ignored) {
+          setIsPending(false);
+        }
       }
     };
 
     fetchData();
 
-    return () => controller.abort();
+    return () => {
+      ignored = true;
+      controller.abort();
+    }
   }, [url, storageKey]);
 
   return { data, isPending, error };
