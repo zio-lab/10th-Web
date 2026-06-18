@@ -88,6 +88,7 @@ export default function LpCreateModal({ onClose }: Props) {
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (mutation.isPending) return;
     if (!title.trim()) { alert("제목을 입력해주세요."); return; }
     if (!content.trim()) { alert("내용을 입력해주세요."); return; }
     if (tags.length === 0) { alert("태그를 하나 이상 입력해주세요."); return; }

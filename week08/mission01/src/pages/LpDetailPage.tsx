@@ -56,6 +56,9 @@ export default function LpDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["lps"] });
       navigate("/");
     },
+    onError: () => {
+      alert("LP 삭제에 실패했습니다.");
+    },
   });
 
   const [thumbError, setThumbError] = useState(false);
