@@ -21,30 +21,33 @@ const VinylIcon = () => (
 
 interface LpCardProps {
   lp: Lp;
+  onClick?: () => void;
 }
 
-const LpCard = ({ lp }: LpCardProps) => {
+const LpCard = ({ lp, onClick }: LpCardProps) => {
   const [imgError, setImgError] = useState(false);
   const showFallback = !lp.thumbnail || imgError;
 
   return (
     <Link
       to={`/lps/${lp.id}`}
-      className="group relative mb-2 block cursor-pointer overflow-hidden break-inside-avoid"
+      className="group relative block cursor-pointer overflow-hidden"
+      onClick={onClick}
     >
-    
-      {showFallback ? (
-        <div className="flex h-48 w-full items-center justify-center bg-gray-800">
-          <VinylIcon />
-        </div>
-      ) : (
-        <img
-          src={lp.thumbnail!}
-          alt={lp.title}
-          className="w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          onError={() => setImgError(true)}
-        />
-      )}
+      <div className="aspect-square w-full overflow-hidden bg-gray-800">
+        {showFallback ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <VinylIcon />
+          </div>
+        ) : (
+          <img
+            src={lp.thumbnail!}
+            alt={lp.title}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={() => setImgError(true)}
+          />
+        )}
+      </div>
 
       {/* Hover overlay */}
       <div className="absolute inset-0 flex flex-col justify-end bg-black/60 p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">

@@ -218,9 +218,9 @@ export default function SearchModal({ onClose }: Props) {
           {trimmed.length > 0 && (
             <>
               {isLoading ? (
-                <div className="columns-2 gap-3 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="mb-3 h-48 animate-pulse rounded-xl bg-gray-800" />
+                    <div key={i} className="aspect-square animate-pulse rounded-xl bg-gray-800" />
                   ))}
                 </div>
               ) : isError ? (
@@ -237,11 +237,11 @@ export default function SearchModal({ onClose }: Props) {
               ) : results.length === 0 ? (
                 <p className="py-10 text-center text-sm text-gray-500">검색 결과가 없습니다.</p>
               ) : (
-                <div className="columns-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   {results.map((lp) => (
-                    <div
+                    <LpCard
                       key={lp.id}
-                      className="mb-3 break-inside-avoid"
+                      lp={lp}
                       onClick={() => {
                         if (trimmed.length > 0) {
                           saveRecentSearch(trimmed);
@@ -249,9 +249,7 @@ export default function SearchModal({ onClose }: Props) {
                         }
                         onClose();
                       }}
-                    >
-                      <LpCard lp={lp} />
-                    </div>
+                    />
                   ))}
                 </div>
               )}
